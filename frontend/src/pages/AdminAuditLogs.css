@@ -1,0 +1,121 @@
+.admin-audit-logs {
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+.logs-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 24px 40px;
+}
+
+.logs-header {
+  margin-bottom: 32px;
+}
+
+.logs-header h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 8px 0;
+}
+
+.logs-header p {
+  font-size: 15px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.logs-table-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+}
+
+.logs-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  min-width: 900px;
+}
+
+.logs-table th {
+  background-color: #f9fafb;
+  padding: 14px 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #4b5563;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.logs-table td {
+  padding: 16px 20px;
+  font-size: 13px;
+  color: #374151;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: top;
+}
+
+.timestamp {
+  white-space: nowrap;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.ip-address {
+  font-family: monospace;
+  font-size: 12px;
+  color: #4b5563;
+}
+
+.action-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.action-success {
+  background-color: #e1f5ee;
+  color: #0f6e56;
+}
+
+.action-danger {
+  background-color: #fef2f2;
+  color: #ef4444;
+}
+
+.action-warning {
+  background-color: #fffbeb;
+  color: #b45309;
+}
+
+.action-info {
+  background-color: #e6f1fb;
+  color: #185fa5;
+}
+
+.meta-details {
+  font-size: 12px;
+  color: #4b5563;
+  max-width: 350px;
+  word-break: break-all;
+}
+
+.text-muted {
+  color: #9ca3af;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px;
+  background: white;
+  border-radius: 12px;
+  color: #6b7280;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}

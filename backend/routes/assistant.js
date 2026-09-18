@@ -202,29 +202,54 @@ router.post('/chat', async (req, res) => {
       return res.status(400).json({ message: 'Message text is required' });
     }
 
-    const assistantUrl = process.env.STS_ASSISTANT_URL || 'http://localhost:8001';
+    const assistantUrl = (process.env.STS_ASSISTANT_URL || 'http://localhost:8001')
+      .trim()
+      .replace(/\/+$/, '')
+      .replace(/\/api\/(?:chat\/?)?$/, '');
     try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), Number(process.env.STS_ASSISTANT_TIMEOUT_MS || 60000));
-      const assistantResponse = await fetch(`${assistantUrl}/api/chat/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
-        body: JSON.stringify({
-          text: String(text).trim(),
-          conversation: Array.isArray(conversation) ? conversation.slice(-12) : [],
-          user: {
-            _id: req.user._id,
-            id: req.user._id,
-            name: req.user.name,
-            email: req.user.email,
-            role: req.user.role,
-            house: req.user.house
-          }
-        })
+      const timeoutMs = Number(process.env.STS_ASSISTANT_TIMEOUT_MS || 120000);
+      const requestBody = JSON.stringify({
+        text: String(text).trim(),
+        conversation: Array.isArray(conversation) ? conversation.slice(-12) : [],
+        user: {
+          _id: req.user._id,
+          id: req.user._id,
+          name: req.user.name,
+          email: req.user.email,
+          role: req.user.role,
+          house: req.user.house
+        }
       });
-      clearTimeout(timeout);
-      const assistantData = await assistantResponse.json();
+      let assistantResponse;
+      let lastAssistantError;
+
+      for (let attempt = 1; attempt <= 2; attempt += 1) {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+          assistantResponse = await fetch(`${assistantUrl}/api/chat/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            signal: controller.signal,
+            body: requestBody
+          });
+          if (assistantResponse.ok || ![502, 503, 504].includes(assistantResponse.status) || attempt === 2) break;
+        } catch (error) {
+          lastAssistantError = error;
+          if (attempt === 2) throw error;
+        } finally {
+          clearTimeout(timeout);
+        }
+      }
+
+      if (!assistantResponse) throw lastAssistantError || new Error('No response from assistant service');
+      const responseText = await assistantResponse.text();
+      let assistantData = {};
+      try {
+        assistantData = responseText ? JSON.parse(responseText) : {};
+      } catch {
+        assistantData = { detail: responseText };
+      }
       if (assistantResponse.ok && assistantData.success && assistantData.response) {
         return res.json({
           response: assistantData.response,
@@ -233,11 +258,17 @@ router.post('/chat', async (req, res) => {
         });
       }
       const upstreamMessage = assistantData.detail || assistantData.message || assistantResponse.statusText;
-      console.error('STS assistant response error:', upstreamMessage);
-      return res.status(502).json({ message: 'Assistant service could not answer this request.' });
+      console.error('STS assistant response error:', assistantResponse.status, upstreamMessage);
+      return res.status(502).json({
+        message: 'Assistant service could not answer this request.',
+        ...(process.env.NODE_ENV !== 'production' ? { detail: upstreamMessage } : {})
+      });
     } catch (assistantError) {
       console.error('STS assistant unavailable:', assistantError.message);
-      return res.status(502).json({ message: 'Assistant service is temporarily unavailable.' });
+      return res.status(502).json({
+        message: 'Assistant service is temporarily unavailable.',
+        ...(process.env.NODE_ENV !== 'production' ? { detail: assistantError.message } : {})
+      });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });

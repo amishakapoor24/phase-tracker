@@ -167,10 +167,18 @@ export default function AssistantPage() {
       };
       utterance.onerror = (e) => {
         setIsSpeaking(false);
-        console.error('Speech error:', e);
+        if (!['canceled', 'interrupted'].includes(e.error)) {
+          console.error('Speech error:', e);
+        }
         resolve();
       };
-      window.speechSynthesis.speak(utterance);
+      try {
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utterance);
+      } catch (error) {
+        setIsSpeaking(false);
+        reject(error);
+      }
     });
   };
 

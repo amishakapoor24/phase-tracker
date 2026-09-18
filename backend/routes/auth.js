@@ -86,19 +86,6 @@ router.post('/register', async (req, res) => {
       house: selectedHouse
     });
     
-    await initProgress(user._id);
-
-    // Audit Log
-    await logAction(user._id, 'user_registered', req.ip, { email: user.email, role: user.role });
-
-    // Send Welcome Email
-    await sendEmail({
-      to: user.email,
-      subject: 'Welcome to PhaseTracker! 🎉',
-      html: getWelcomeTemplate(user.name),
-      type: 'welcome'
-    });
-
     res.status(201).json({
       _id: user._id, 
       name: user.name, 
@@ -106,6 +93,20 @@ router.post('/register', async (req, res) => {
       role: user.role,
       house: user.house,
       token: generateToken(user._id)
+    });
+
+    // These side effects must not delay account creation or the first login.
+    void Promise.all([
+      initProgress(user._id),
+      logAction(user._id, 'user_registered', req.ip, { email: user.email, role: user.role }),
+      sendEmail({
+        to: user.email,
+        subject: 'Welcome to PhaseTracker! 🎉',
+        html: getWelcomeTemplate(user.name),
+        type: 'welcome'
+      })
+    ]).catch((error) => {
+      console.error('Post-registration setup failed:', error.message);
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -123,9 +124,6 @@ router.post('/login', async (req, res) => {
       return res.status(403).json({ message: 'Your account has been disabled. Please contact an admin.' });
     }
 
-    // Audit Log
-    await logAction(user._id, 'user_logged_in', req.ip);
-
     res.json({
       _id: user._id, 
       name: user.name, 
@@ -133,6 +131,10 @@ router.post('/login', async (req, res) => {
       role: user.role,
       house: user.house,
       token: generateToken(user._id)
+    });
+
+    void logAction(user._id, 'user_logged_in', req.ip).catch((error) => {
+      console.error('Login audit failed:', error.message);
     });
   } catch (err) {
     res.status(500).json({ message: err.message });

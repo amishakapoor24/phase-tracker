@@ -95,11 +95,11 @@ export default function NotificationsPage() {
             {notifications.map(notif => (
               <li key={notif.id} style={{ 
                 display: 'flex', gap: '16px', padding: '20px', borderRadius: '12px',
-                background: notif.type === 'announcement' ? '#F3F4F6' : notif.type === 'pending' ? '#FEF3C7' : '#FEE2E2',
-                border: `1px solid ${notif.type === 'announcement' ? '#E5E7EB' : notif.type === 'pending' ? '#FDE68A' : '#FECACA'}`
+                background: notif.type === 'announcement' ? '#F3F4F6' : notif.type === 'pending' ? '#FEF3C7' : notif.type === 'approved' ? '#D1FAE5' : '#FEE2E2',
+                border: `1px solid ${notif.type === 'announcement' ? '#E5E7EB' : notif.type === 'pending' ? '#FDE68A' : notif.type === 'approved' ? '#34D399' : '#FECACA'}`
               }}>
                 <div style={{ fontSize: '24px' }}>
-                  {notif.type === 'announcement' ? '📢' : notif.type === 'pending' ? '⏳' : '❌'}
+                  {notif.type === 'announcement' ? '📢' : notif.type === 'pending' ? '⏳' : notif.type === 'approved' ? '✅' : '❌'}
                 </div>
                 <div>
                   <strong style={{ display: 'block', fontSize: '16px', marginBottom: '4px', color: '#1F2937' }}>{notif.title}</strong>

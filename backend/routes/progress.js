@@ -45,19 +45,9 @@ router.post('/submit', protect, async (req, res) => {
     phase.attempts.push({ score, total, percentage, passed });
     if (percentage > phase.bestScore) phase.bestScore = percentage;
 
-    if (passed && phase.status !== 'completed') {
-      phase.status = 'completed';
-      phase.completedAt = new Date();
-      const nextIndex = PHASE_ORDER.indexOf(phaseId) + 1;
-      if (nextIndex < PHASE_ORDER.length) {
-        const nextPhase = progress.phases.find(p => p.phaseId === PHASE_ORDER[nextIndex]);
-        if (nextPhase && nextPhase.status === 'locked') {
-          nextPhase.status = 'unlocked';
-          nextPhase.unlockedAt = new Date();
-        }
-        progress.currentPhase = PHASE_ORDER[nextIndex];
-      }
-    }
+    // We no longer auto-complete the phase here. 
+    // The sub-phase approval workflow is the primary source of truth for phase completion.
+    // We just record the quiz score in attempts and bestScore above.
 
     // Recalculate totalScore
     progress.totalScore = progress.phases.reduce((sum, p) => sum + (p.bestScore || 0), 0);

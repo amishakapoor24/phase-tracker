@@ -207,7 +207,7 @@ router.get('/profile/:id', protect, async (req, res) => {
       const allSubPhases = await SubPhase.find();
       
       allPhases.forEach(p => {
-        phaseMappings[p.id] = { title: p.title, subPhases: {} };
+        phaseMappings[p.id] = { title: p.name, subPhases: {} };
       });
       allSubPhases.forEach(sp => {
         if (phaseMappings[sp.phaseId]) {
@@ -245,7 +245,7 @@ router.post('/forgotpassword', async (req, res) => {
         to: user.email,
         subject: 'Password Reset Request',
         html: getForgotPasswordTemplate(resetUrl),
-        type: 'password_reset'
+        type: 'custom'
       });
 
       res.status(200).json({ message: 'Email sent' });

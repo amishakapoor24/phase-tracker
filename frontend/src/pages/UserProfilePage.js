@@ -81,7 +81,7 @@ export default function UserProfilePage() {
       const res = await axios.put('/api/auth/me', payload);
       
       // Update local storage and context if we edited ourselves
-      localStorage.setItem('userInfo', JSON.stringify(res.data));
+      localStorage.setItem('pt_user', JSON.stringify(res.data));
       // Hacky way to update context without a full refresh, ideally useAuth would expose an update function
       // But reloading the window is safest for now to sync everything
       window.location.reload();

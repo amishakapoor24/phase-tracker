@@ -4,6 +4,16 @@ const User = require('./models/User');
 
 const createAdmin = async () => {
   try {
+    const adminEmail = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+    const adminPassword = process.env.ADMIN_PASSWORD || '';
+
+    if (!adminEmail || !adminPassword) {
+      throw new Error('ADMIN_EMAIL and ADMIN_PASSWORD must be configured in backend/.env');
+    }
+    if (adminPassword.length < 12) {
+      throw new Error('ADMIN_PASSWORD must be at least 12 characters long');
+    }
+
     await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -11,7 +21,6 @@ const createAdmin = async () => {
     
     console.log('MongoDB connected.');
 
-    const adminEmail = 'admin@phasetracker.com';
     const exists = await User.findOne({ email: adminEmail });
 
     if (exists) {
@@ -22,16 +31,15 @@ const createAdmin = async () => {
     const admin = await User.create({
       name: 'Super Admin',
       email: adminEmail,
-      password: 'password123',
+      password: adminPassword,
       role: 'admin',
     });
 
     console.log('SUCCESS! Initial Admin Created.');
     console.log('---------------------------------');
     console.log(`Email: ${admin.email}`);
-    console.log(`Password: password123`);
     console.log('---------------------------------');
-    console.log('You can login with these credentials and create more mentors/admins from the Dashboard.');
+    console.log('Use the configured admin password to sign in.');
 
     process.exit(0);
   } catch (err) {

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
@@ -5,8 +6,10 @@ import './Navbar.css';
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const handleLogout = () => { logout(); navigate('/'); };
+  const handleLogout = () => { logout(); navigate('/'); setMenuOpen(false); };
+  const closeMenu = () => setMenuOpen(false);
 
   return (
     <nav className="navbar">
@@ -79,6 +82,9 @@ export default function Navbar() {
       <div className="nav-actions">
         {user ? (
           <>
+            <Link to="/assistant" className="btn btn-outline btn-sm" style={{ padding: '4px 8px', marginRight: '8px', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+              🎙️ Assistant
+            </Link>
             <Link to="/notifications" className="btn btn-outline btn-sm" style={{ padding: '4px 8px', marginRight: '8px', textDecoration: 'none' }}>
               🔔
             </Link>
@@ -93,6 +99,40 @@ export default function Navbar() {
             <Link to="/register" className="btn btn-primary btn-sm">Create free account</Link>
           </>
         )}
+      </div>
+      <button
+        className="nav-menu-toggle"
+        type="button"
+        aria-expanded={menuOpen}
+        aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+        onClick={() => setMenuOpen(open => !open)}
+      >
+        {menuOpen ? '×' : '☰'}
+      </button>
+      <div className={`nav-mobile-menu${menuOpen ? ' is-open' : ''}`}>
+        <div className="nav-mobile-links" onClick={closeMenu}>
+          {user?.role === 'admin' ? (
+            <>
+              <Link to="/admin">Dashboard</Link><Link to="/admin/phases">Phases</Link>
+              <Link to="/admin/questions">Manage Quizzes</Link><Link to="/admin/approvals">Approvals</Link>
+              <Link to="/admin/users">Students</Link><Link to="/admin/houses">Houses</Link>
+              <Link to="/admin/announcements">Announcements</Link><Link to="/admin/analytics">Analytics</Link>
+              <Link to="/admin/audit-logs">Audit Logs</Link>
+            </>
+          ) : user?.role === 'mentor' ? (
+            <>
+              <Link to="/mentor">Dashboard</Link><Link to="/admin/phases">Phases</Link>
+              <Link to="/admin/questions">Manage Quizzes</Link><Link to="/admin/approvals">Approvals</Link>
+              <Link to="/admin/users">Students</Link><Link to="/admin/announcements">Announcements</Link>
+              <Link to="/admin/analytics">Analytics</Link>
+            </>
+          ) : (
+            <><Link to="/">Home</Link>{user && <Link to="/dashboard">Dashboard</Link>}</>
+          )}
+        </div>
+        <div className="nav-mobile-actions" onClick={closeMenu}>
+          {user ? <><Link to="/assistant">🎙️ Assistant</Link><Link to="/notifications">🔔 Notifications</Link><Link to="/profile">Profile</Link></> : <><Link to="/login">Login</Link><Link to="/register">Create free account</Link></>}
+        </div>
       </div>
     </nav>
   );

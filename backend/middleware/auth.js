@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { hasRouteAccess, normalizeRoute } = require('../utils/roleAccess');
 
 const protect = async (req, res, next) => {
   let token;
@@ -20,6 +21,21 @@ const protect = async (req, res, next) => {
   }
 };
 
+const requireRouteAccess = (routeName) => (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ message: 'Not authorized, no user context' });
+  }
+
+  const requestedRoute = normalizeRoute(routeName || `${req.baseUrl || ''}/${req.path || ''}`);
+  if (!hasRouteAccess(req.user.role, requestedRoute)) {
+    return res.status(403).json({
+      message: `Access denied for ${req.user.role}. This route is outside your permitted scope.`
+    });
+  }
+
+  next();
+};
+
 const adminOnly = (req, res, next) => {
   if (req.user && req.user.role === 'admin') {
     next();
@@ -36,4 +52,4 @@ const mentorOrAdmin = (req, res, next) => {
   }
 };
 
-module.exports = { protect, adminOnly, mentorOrAdmin };
+module.exports = { protect, adminOnly, mentorOrAdmin, requireRouteAccess };

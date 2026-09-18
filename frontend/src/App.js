@@ -24,6 +24,8 @@ import AdminHouses from './pages/AdminHouses';
 import AdminAnnouncements from './pages/AdminAnnouncements';
 import NotificationsPage from './pages/NotificationsPage';
 import StudentProgressPage from './pages/StudentProgressPage';
+import AssistantPage from './pages/AssistantPage';
+
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return <div className="page-center"><div className="spinner" /></div>;
@@ -71,6 +73,8 @@ export default function App() {
           <Route path="/profile" element={<PrivateRoute><UserProfilePage /></PrivateRoute>} />
           <Route path="/profile/:id" element={<PrivateRoute><UserProfilePage /></PrivateRoute>} />
           <Route path="/notifications" element={<PrivateRoute><NotificationsPage /></PrivateRoute>} />
+          <Route path="/assistant" element={<PrivateRoute><AssistantPage /></PrivateRoute>} />
+          <Route path="/assistant/:role" element={<PrivateRoute><AssistantPage /></PrivateRoute>} />
           
           
           {/* Admin/Mentor Routes */}

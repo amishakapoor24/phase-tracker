@@ -1,4 +1,4 @@
-.home { min-height: 100vh; background: #fff; }
+.home { min-height: 100vh; background: #fff; display: flex; flex-direction: column; }
 
 .hero { padding: 80px 32px 64px; text-align: center; background: #fff; border-bottom: 1px solid var(--border); }
 .hero-inner { max-width: 720px; margin: 0 auto; }
@@ -28,7 +28,7 @@
 .faq-icon { font-size: 18px; color: var(--green); font-weight: 400; }
 .faq-a { padding: 4px 18px 16px; font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
 
-.footer { background: #1a2332; padding: 48px 32px 0; }
+.footer { background: #1a2332; padding: 48px 32px 0; margin-top: auto; }
 .footer-inner { display: grid; grid-template-columns: 1.5fr 1fr; gap: 48px; max-width: 900px; margin: 0 auto; padding-bottom: 40px; border-bottom: 1px solid #2a3848; }
 .footer-brand p { font-size: 13px; color: #8899aa; margin: 12px 0 20px; line-height: 1.7; }
 .footer-stats { display: flex; gap: 28px; }

@@ -65,14 +65,14 @@ export default function DashboardPage() {
               
               {/* Current Progress Banner */}
               {progress?.currentPhase && (
-                <div style={{ marginTop: '12px', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                  <div style={{ background: '#EEF2FF', padding: '8px 16px', borderRadius: '8px', border: '1px solid #C7D2FE' }}>
+                <div className="current-progress-grid" style={{ marginTop: '12px', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                  <div className="current-progress-card current-progress-card-phase" style={{ background: '#EEF2FF', padding: '8px 16px', borderRadius: '8px', border: '1px solid #C7D2FE' }}>
                     <span style={{ fontSize: '12px', color: '#6B7280', display: 'block', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>Current Phase</span>
                     <strong style={{ color: '#4F46E5', fontSize: '15px' }}>
                       {phases.find(p => p.id === progress.currentPhase)?.name || progress.currentPhase}
                     </strong>
                   </div>
-                  <div style={{ background: '#FEF3C7', padding: '8px 16px', borderRadius: '8px', border: '1px solid #FDE68A' }}>
+                  <div className="current-progress-card current-progress-card-subphase" style={{ background: '#FEF3C7', padding: '8px 16px', borderRadius: '8px', border: '1px solid #FDE68A' }}>
                     <span style={{ fontSize: '12px', color: '#6B7280', display: 'block', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>Current Sub-Phase</span>
                     <strong style={{ color: '#D97706', fontSize: '15px' }}>
                       {(() => {

@@ -45,8 +45,8 @@ export default function QuizPage() {
     setSubmitting(true);
     try {
       const answersArr = questions.map((_, i) => answers[i] ?? -1);
-      const { data: valData } = await axios.post(`/api/quiz/${phaseId}/validate`, { answers: answersArr });
-      await axios.post('/api/progress/submit', { phaseId, score: valData.score, total: valData.total });
+      const { data: valData } = await axiosInstance.post(`/api/quiz/${phaseId}/validate`, { answers: answersArr });
+      await axiosInstance.post('/api/progress/submit', { phaseId, score: valData.score, total: valData.total });
       navigate(`/result/${phaseId}`, { state: { ...valData, phaseId } });
     } catch { setError('Submission failed. Please try again.'); setSubmitting(false); }
   }, [answers, questions, phaseId, navigate]);

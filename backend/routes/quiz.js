@@ -1,5 +1,6 @@
 const express = require('express');
 const { protect } = require('../middleware/auth');
+const Question = require('../models/Question');
 const router = express.Router();
 
 const QUESTIONS = {
@@ -77,24 +78,47 @@ const QUESTIONS = {
   ]
 };
 
-router.get('/:phaseId', protect, (req, res) => {
-  const questions = QUESTIONS[req.params.phaseId];
-  if (!questions) return res.status(404).json({ message: 'Quiz not found' });
-  const sanitized = questions.map(({ answer, ...q }) => q);
-  res.json(sanitized);
+router.get('/:phaseId', protect, async (req, res) => {
+  try {
+    const dbQuestions = await Question.find({ phaseId: req.params.phaseId }).select('-answer');
+    if (dbQuestions.length > 0) {
+      // Map _id to id so frontend can use it consistently
+      const mapped = dbQuestions.map(q => {
+        const obj = q.toObject();
+        obj.id = obj._id;
+        return obj;
+      });
+      return res.json(mapped);
+    }
+    const questions = QUESTIONS[req.params.phaseId];
+    if (!questions) return res.status(404).json({ message: 'Quiz not found' });
+    const sanitized = questions.map(({ answer, ...q }) => q);
+    res.json(sanitized);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
-router.post('/:phaseId/validate', protect, (req, res) => {
-  const { answers } = req.body;
-  const questions = QUESTIONS[req.params.phaseId];
-  if (!questions) return res.status(404).json({ message: 'Quiz not found' });
-  let score = 0;
-  const results = questions.map((q, i) => {
-    const correct = q.answer === answers[i];
-    if (correct) score++;
-    return { questionId: q.id, correct, correctAnswer: q.answer, yourAnswer: answers[i] };
-  });
-  res.json({ score, total: questions.length, percentage: Math.round((score / questions.length) * 100), results });
+router.post('/:phaseId/validate', protect, async (req, res) => {
+  try {
+    const { answers } = req.body;
+    let questions = await Question.find({ phaseId: req.params.phaseId });
+    
+    if (questions.length === 0) {
+      questions = QUESTIONS[req.params.phaseId];
+      if (!questions) return res.status(404).json({ message: 'Quiz not found' });
+    }
+
+    let score = 0;
+    const results = questions.map((q, i) => {
+      const correct = q.answer === answers[i];
+      if (correct) score++;
+      return { questionId: q.id || q._id, correct, correctAnswer: q.answer, yourAnswer: answers[i] };
+    });
+    res.json({ score, total: questions.length, percentage: Math.round((score / questions.length) * 100), results });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 module.exports = router;

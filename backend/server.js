@@ -45,6 +45,7 @@ app.use('/api/subphases', require('./routes/subphases'));
 app.use('/api/uploads', require('./routes/uploads'));
 app.use('/api/houses', require('./routes/houses'));
 app.use('/api/announcements', require('./routes/announcements'));
+app.use('/api/assistant', require('./routes/assistant'));
 app.use('/api/admin/analytics', require('./routes/analytics'));
 app.use('/api/analytics', require('./routes/analytics'));
 
@@ -52,17 +53,33 @@ app.get('/', (req, res) => res.json({ message: 'PhaseTracker API running' }));
 
 app.use(errorHandler);
 
-mongoose.connect(process.env.MONGO_URI, {
-  connectTimeoutMS: 5000,
-  serverSelectionTimeoutMS: 5000,
-})
-  .then(() => {
-    console.log('MongoDB connected');
-    app.listen(process.env.PORT, () =>
-      console.log(`Server running on http://localhost:${process.env.PORT}`)
-    );
-  })
-  .catch(err => { 
-    console.error('MongoDB connection error:', err.message); 
-    process.exit(1); 
-  });
+const connectToMongoAndStart = async () => {
+  if (!process.env.MONGO_URI) {
+    console.error('MONGO_URI is required. Add it to backend/.env before starting the server.');
+    process.exit(1);
+  }
+
+  const retryDelayMs = Number(process.env.MONGO_RETRY_DELAY_MS || 5000);
+
+  while (true) {
+    try {
+      await mongoose.connect(process.env.MONGO_URI, {
+        dbName: process.env.MONGO_DB || 'test',
+        connectTimeoutMS: 5000,
+        serverSelectionTimeoutMS: 5000,
+      });
+
+      console.log(`MongoDB connected to database: ${mongoose.connection.name}`);
+      app.listen(process.env.PORT, () =>
+        console.log(`Server running on http://localhost:${process.env.PORT}`)
+      );
+      return;
+    } catch (err) {
+      console.error(`MongoDB connection error: ${err.message}`);
+      console.error(`Retrying MongoDB connection in ${retryDelayMs}ms`);
+      await new Promise(resolve => setTimeout(resolve, retryDelayMs));
+    }
+  }
+};
+
+connectToMongoAndStart();

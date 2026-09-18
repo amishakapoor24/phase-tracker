@@ -315,9 +315,9 @@ export default function AdminPhases() {
                   </td>
                   <td><small>{phase.createdBy?.name || 'Unknown'}</small></td>
                   <td>
-                    <Link to={`/admin/subphases/${phase.id}`} className="btn-small btn-subphases">📋 Manage Sub-Phases</Link>
-                    <button className="btn-small btn-edit" onClick={() => handleEdit(phase)}>✏️ Edit</button>
-                    <button className="btn-small btn-delete" onClick={() => handleDelete(phase.id)}>🗑️ Delete</button>
+                    <Link to={`/admin/subphases/${phase.id}`} className="btn-small btn-subphases">Manage Sub-Phases</Link>
+                    <button className="btn-small btn-edit" onClick={() => handleEdit(phase)}>Edit</button>
+                    <button className="btn-small btn-delete" onClick={() => handleDelete(phase.id)}>Delete</button>
                   </td>
                 </tr>
               ))}

@@ -2,6 +2,8 @@
   padding: 2rem;
   max-width: 900px;
   margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .profile-header {
@@ -46,12 +48,14 @@
   margin: 0 0 0.5rem 0;
   font-size: 2.5rem;
   color: var(--text-main);
+  overflow-wrap: anywhere;
 }
 
 .profile-email {
   color: var(--text-muted);
   font-size: 1.1rem;
   margin-top: 0.5rem;
+  overflow-wrap: anywhere;
 }
 
 .profile-tags {
@@ -296,3 +300,189 @@
   color: #065f46;
 }
 
+@media (max-width: 768px) {
+  .profile-page {
+    padding: 1rem;
+    max-width: 100%;
+  }
+
+  .profile-header {
+    padding: 1.25rem;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: flex-start;
+  }
+
+  .profile-avatar {
+    width: 72px;
+    height: 72px;
+    border-width: 3px;
+  }
+
+  .avatar-placeholder {
+    font-size: 1.75rem;
+  }
+
+  .profile-info {
+    min-width: 0;
+    padding-right: 2.75rem;
+  }
+
+  .profile-info h1 {
+    font-size: clamp(1.5rem, 7vw, 2rem);
+    margin-bottom: 0.35rem;
+  }
+
+  .profile-email {
+    font-size: 0.85rem;
+    line-height: 1.35;
+  }
+
+  .profile-tags {
+    gap: 0.35rem;
+    flex-wrap: wrap;
+  }
+
+  .role-tag,
+  .house-tag {
+    padding: 0.2rem 0.55rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.25px;
+  }
+
+  .edit-btn {
+    top: 1rem;
+    right: 1rem;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.75rem;
+  }
+
+  .profile-content .card,
+  .edit-profile-section.card {
+    padding: 1rem;
+  }
+
+  .profile-content h2,
+  .edit-profile-section h2 {
+    font-size: 1.25rem;
+    line-height: 1.25;
+  }
+
+  .portfolio-timeline {
+    gap: 0.85rem;
+    margin-top: 1rem;
+  }
+
+  .portfolio-timeline::before {
+    left: 16px;
+  }
+
+  .timeline-item {
+    gap: 0.65rem;
+  }
+
+  .timeline-marker {
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+  }
+
+  .timeline-content {
+    min-width: 0;
+    padding: 0.8rem;
+  }
+
+  .timeline-content h4 {
+    font-size: 0.95rem;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+
+  .status-badge {
+    font-size: 0.72rem;
+  }
+
+  .achievement {
+    margin-top: 0.65rem;
+    padding: 0.65rem;
+  }
+
+  .achievement p,
+  .submission-text,
+  .submission-feedback {
+    font-size: 0.8rem;
+  }
+
+  .submissions-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .submission-card {
+    min-width: 0;
+    padding: 0.9rem;
+    gap: 0.7rem;
+  }
+
+  .submission-header {
+    gap: 0.5rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .submission-title {
+    font-size: 0.95rem;
+    overflow-wrap: anywhere;
+  }
+
+  .submission-date {
+    font-size: 0.72rem;
+  }
+
+  .edit-actions {
+    gap: 0.6rem;
+    margin-top: 1rem;
+  }
+
+  .edit-actions .btn {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .profile-page {
+    padding: 0.65rem;
+  }
+
+  .profile-header {
+    padding: 0.9rem;
+  }
+
+  .profile-avatar {
+    width: 58px;
+    height: 58px;
+  }
+
+  .profile-info {
+    padding-right: 2.25rem;
+  }
+
+  .profile-info h1 {
+    font-size: 1.35rem;
+  }
+
+  .profile-email {
+    font-size: 0.75rem;
+  }
+
+  .profile-content .card,
+  .edit-profile-section.card {
+    padding: 0.8rem;
+  }
+
+  .edit-btn {
+    font-size: 0.68rem;
+    padding: 0.35rem 0.5rem;
+  }
+}

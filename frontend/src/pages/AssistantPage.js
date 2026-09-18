@@ -52,6 +52,7 @@ export default function AssistantPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const voiceEnabledRef = useRef(true);
   const [typedText, setTypedText] = useState('');
   const [messages, setMessages] = useState([]);
   const [stage, setStage] = useState('Ready when you are');
@@ -81,8 +82,13 @@ export default function AssistantPage() {
   const audioRef = useRef(null);
   const audioUrlRef = useRef(null);
   const assistantStorageKey = useRef(null);
+  const messagesAreaRef = useRef(null);
+  const shouldScrollToLatestRef = useRef(false);
 
-  const addMessage = (sender, text) => setMessages(prev => [...prev, { sender, text }].slice(-MAX_STORED_MESSAGES));
+  const addMessage = (sender, text) => {
+    shouldScrollToLatestRef.current = true;
+    setMessages(prev => [...prev, { sender, text }].slice(-MAX_STORED_MESSAGES));
+  };
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem('pt_user') || '{}');
@@ -114,6 +120,17 @@ export default function AssistantPage() {
     localStorage.setItem(assistantStorageKey.current, JSON.stringify(messages.slice(-MAX_STORED_MESSAGES)));
   }, [messages]);
 
+  useEffect(() => {
+    if (!shouldScrollToLatestRef.current || !messagesAreaRef.current) return;
+    shouldScrollToLatestRef.current = false;
+    requestAnimationFrame(() => {
+      messagesAreaRef.current?.scrollTo({
+        top: messagesAreaRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    });
+  }, [messages]);
+
   const stopSpeaking = () => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
@@ -133,7 +150,8 @@ export default function AssistantPage() {
     audio.play().catch(() => setIsSpeaking(false));
   };
 
-  const speakText = async (text) => {
+  const speakText = async (text, force = false) => {
+    if (!voiceEnabledRef.current && !force) return;
     setStage('Preparing voice reply');
     return new Promise((resolve, reject) => {
       if (!('speechSynthesis' in window)) {
@@ -158,10 +176,10 @@ export default function AssistantPage() {
 
   const replayLastResponse = async (allowWhenDisabled = false) => {
     if (!lastAiText || isProcessing || (!voiceEnabled && !allowWhenDisabled)) return;
-    try { await speakText(lastAiText); } catch (err) { toast.error('Could not replay the response'); console.error(err); }
+    try { await speakText(lastAiText, allowWhenDisabled); } catch (err) { toast.error('Could not replay the response'); console.error(err); }
   };
 
-  const sendTextToAssistant = async (userText, shouldSpeak) => {
+  const sendTextToAssistant = async userText => {
     const conversation = messages.slice(-10).map(message => ({
       role: message.sender === 'ai' ? 'assistant' : 'user',
       content: message.text,
@@ -175,7 +193,14 @@ export default function AssistantPage() {
     const aiText = chatRes.data.response;
     addMessage('ai', aiText);
     setLastAiText(aiText);
-    if (shouldSpeak) await speakText(aiText); else setStage('Reply ready');
+    if (voiceEnabledRef.current) await speakText(aiText); else setStage('Reply ready');
+  };
+
+  const toggleVoice = () => {
+    const nextVoiceEnabled = !voiceEnabledRef.current;
+    voiceEnabledRef.current = nextVoiceEnabled;
+    setVoiceEnabled(nextVoiceEnabled);
+    if (!nextVoiceEnabled) stopSpeaking();
   };
 
   const submitTypedText = async event => {
@@ -185,7 +210,7 @@ export default function AssistantPage() {
     setIsProcessing(true);
     setTypedText('');
     try {
-      await sendTextToAssistant(text, voiceEnabled);
+      await sendTextToAssistant(text);
     } catch (err) {
       setStage('Something went wrong');
       toast.error('Error processing your message', { id: 'voice-toast' });
@@ -205,7 +230,7 @@ export default function AssistantPage() {
       });
       const data = await response.json();
       if (!response.ok || !data.text?.trim()) throw new Error(data.detail || 'No speech was detected');
-      await sendTextToAssistant(data.text.trim(), voiceEnabled);
+      await sendTextToAssistant(data.text.trim());
     } catch (err) {
       setStage('Microphone unavailable');
       toast.error(err.message || 'Could not transcribe your recording');
@@ -251,7 +276,7 @@ export default function AssistantPage() {
         recognition.onstart = () => { setIsRecording(true); setStage('Listening...'); };
         recognition.onresult = async event => {
           const text = event.results[0][0].transcript;
-          try { setIsProcessing(true); await sendTextToAssistant(text, voiceEnabled); }
+          try { setIsProcessing(true); await sendTextToAssistant(text); }
           catch (err) { toast.error('Error processing your request'); console.error(err); }
           finally { setIsProcessing(false); }
         };
@@ -298,14 +323,14 @@ export default function AssistantPage() {
         <header className="assistant-header">
           <div><div className="assistant-kicker"><span className="status-dot" /> VOICE WORKSPACE</div><h1>Talk it through.</h1><p>A focused space for quick questions, ideas, and useful next steps.</p></div>
           <div className="assistant-actions">
-            <button className={`control-button ${voiceEnabled ? 'is-active' : ''}`} onClick={() => { setVoiceEnabled(!voiceEnabled); if (voiceEnabled) stopSpeaking(); }} aria-pressed={voiceEnabled} title={voiceEnabled ? 'Turn voice replies off' : 'Turn voice replies on'}><Icon name={voiceEnabled ? 'volume' : 'muted'} size={18} /><span>{voiceEnabled ? 'Voice on' : 'Voice off'}</span></button>
+            <button className={`control-button ${voiceEnabled ? 'is-active' : ''}`} onClick={toggleVoice} aria-pressed={voiceEnabled} title={voiceEnabled ? 'Turn voice replies off' : 'Turn voice replies on'}><Icon name={voiceEnabled ? 'volume' : 'muted'} size={18} /><span>{voiceEnabled ? 'Voice on' : 'Voice off'}</span></button>
             <button className="icon-button" onClick={() => { setMessages([]); setLastAiText(''); if (assistantStorageKey.current) localStorage.removeItem(assistantStorageKey.current); }} disabled={!messages.length} title="Clear conversation" aria-label="Clear conversation"><Icon name="trash" size={18} /></button>
           </div>
         </header>
         <section className="assistant-grid">
           <div className="conversation-panel">
             <div className="conversation-topline"><span>Conversation</span><span className="conversation-count">{messages.length} {messages.length === 1 ? 'message' : 'messages'}</span></div>
-            <div className="messages-area">
+            <div className="messages-area" ref={messagesAreaRef}>
               {messages.length === 0 ? <div className="empty-state"><div className="empty-icon"><Icon name="spark" size={25} /></div><h2>What is on your mind?</h2><p>Tap the microphone and speak naturally. Your transcript and my response will appear here.</p><div className="suggestion-row"><span>Ask a question</span><span>Explore an idea</span><span>Plan a task</span></div></div> : messages.map((message, index) => <div className={`message-row ${message.sender}`} key={`${message.sender}-${index}`}><div className="message-avatar">{message.sender === 'ai' ? <Icon name="spark" size={15} /> : 'You'}</div><div className="message-content"><span className="message-label">{message.sender === 'ai' ? 'Assistant' : 'You'}</span><div className="message-bubble">{message.sender === 'ai' ? <AssistantMessage text={message.text} /> : message.text}</div></div></div>)}
               {isProcessing && <div className="thinking-row"><span className="thinking-dots"><i /><i /><i /></span> {stage}</div>}
             </div>

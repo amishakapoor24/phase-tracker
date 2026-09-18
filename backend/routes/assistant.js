@@ -205,7 +205,7 @@ router.post('/chat', async (req, res) => {
     const assistantUrl = process.env.STS_ASSISTANT_URL || 'http://localhost:8001';
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), Number(process.env.STS_ASSISTANT_TIMEOUT_MS || 30000));
+      const timeout = setTimeout(() => controller.abort(), Number(process.env.STS_ASSISTANT_TIMEOUT_MS || 60000));
       const assistantResponse = await fetch(`${assistantUrl}/api/chat/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

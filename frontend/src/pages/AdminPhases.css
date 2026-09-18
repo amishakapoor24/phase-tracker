@@ -1,5 +1,5 @@
 .admin-phases { min-height: 100vh; background: var(--gray); }
-.admin-phases-inner { max-width: 1200px; margin: 0 auto; padding: 36px 24px; }
+.admin-phases-inner { max-width: 1240px; margin: 0 auto; padding: 32px 24px 56px; }
 
 .admin-phases-header {
   display: flex;
@@ -76,10 +76,13 @@
   border: 1px solid var(--border);
   overflow: hidden;
   box-shadow: var(--shadow);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .phases-table table {
   width: 100%;
+  min-width: 780px;
   border-collapse: collapse;
 }
 
@@ -150,6 +153,7 @@
 }
 
 @media (max-width: 768px) {
+  .admin-phases-inner { padding: 22px 16px 40px; }
   .admin-phases-header {
     flex-direction: column;
     gap: 12px;
@@ -163,9 +167,22 @@
     overflow-x: auto;
   }
 
+  .phase-form { padding: 22px 18px; }
+  .admin-phases-header { padding: 22px 18px; }
+  .admin-phases-header h1 { font-size: 22px; }
+  .admin-phases-header p { font-size: 12px; line-height: 1.5; }
+
   .form-actions {
     flex-direction: column;
   }
+}
+
+@media (max-width: 480px) {
+  .admin-phases-inner { padding-inline: 12px; }
+  .admin-phases-header { padding: 18px 14px; }
+  .admin-phases-header .btn { width: 100%; }
+  .phase-form { padding: 18px 14px; }
+  .form-actions .btn { width: 100%; }
 }
 
 .success-option-card {

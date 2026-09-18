@@ -276,6 +276,11 @@
 }
 
 @media (max-width: 768px) {
+  .admin-questions-inner { padding: 22px 16px 40px; }
+  .admin-questions-header { padding: 20px 18px; margin-bottom: 16px; }
+  .admin-questions-header h1 { font-size: 22px; }
+  .admin-questions-header p { font-size: 12px; line-height: 1.5; }
+  .phase-selector, .question-form, .questions-list { padding: 18px; margin-bottom: 16px; }
   .admin-questions-header {
     flex-direction: column;
     gap: 12px;
@@ -293,6 +298,14 @@
   .form-actions {
     flex-direction: column;
   }
+  .form-actions .btn { width: 100%; }
+}
+
+@media (max-width: 420px) {
+  .admin-questions-inner { padding-inline: 12px; }
+  .admin-questions-header, .phase-selector, .question-form, .questions-list { padding: 16px 14px; }
+  .question-content { gap: 10px; }
+  .question-card { padding: 14px; }
 }
 
 .success-option-card {

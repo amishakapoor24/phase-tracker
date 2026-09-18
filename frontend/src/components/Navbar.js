@@ -14,14 +14,15 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       {/* Logo Section - Left */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div className="nav-brand-shell">
         <button 
-          className="btn btn-outline btn-sm" 
+          className="btn btn-outline btn-sm nav-back-button" 
           onClick={() => navigate(-1)}
           style={{ padding: '4px 12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           title="Go Back"
+          aria-label="Go back"
         >
-          ← Back
+          <span aria-hidden="true">←</span><span className="nav-back-label"> Back</span>
         </button>
         <Link to="/" className="nav-logo">
           <div className="nav-logo-icon">

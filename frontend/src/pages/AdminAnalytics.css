@@ -6,7 +6,7 @@
 .analytics-inner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 80px 24px 40px;
+  padding: 32px 24px 56px;
 }
 
 .analytics-header {
@@ -80,9 +80,23 @@
 }
 
 @media (max-width: 768px) {
+  .analytics-inner { padding: 22px 16px 40px; }
+  .analytics-header h1 { font-size: 23px; }
+  .analytics-header p { font-size: 13px; line-height: 1.5; }
+  .summary-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .summary-card { padding: 15px; }
+  .summary-val { font-size: 21px; }
+  .summary-label { font-size: 11px; }
+  .summary-icon { width: 36px; height: 36px; font-size: 16px; }
   .analytics-grid {
     grid-template-columns: 1fr;
   }
+}
+
+@media (max-width: 420px) {
+  .analytics-inner { padding-inline: 12px; }
+  .summary-cards { grid-template-columns: 1fr; }
+  .analytics-section { padding: 18px 14px; }
 }
 
 .analytics-section {

@@ -131,16 +131,16 @@
 
 @media (max-width: 768px) {
   .admin-inner { padding: 22px 16px 40px; }
-  .admin-header { padding: 22px 20px; }
+  .admin-header { padding: 20px; margin-bottom: 16px; }
   .admin-sections {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
   }
 
-  .admin-card { padding: 18px 15px; }
+  .admin-card { padding: 16px 14px; }
   .admin-card-icon { font-size: 26px; }
-  .admin-card h3 { font-size: 15px; }
-  .admin-card p { font-size: 12px; }
+  .admin-card h3 { font-size: 14px; }
+  .admin-card p { font-size: 11px; line-height: 1.45; }
   .admin-card .btn { width: 100%; white-space: normal; }
 
   .phase-item {
@@ -160,14 +160,14 @@
 
 @media (max-width: 480px) {
   .admin-inner { padding-inline: 12px; }
-  .admin-header { padding: 18px 16px; }
+  .admin-header { padding: 16px 14px; }
   .admin-header p { font-size: 12px; line-height: 1.55; }
   .admin-sections { grid-template-columns: 1fr; }
-  .admin-card { display: grid; grid-template-columns: auto 1fr; column-gap: 12px; text-align: left; align-items: center; }
+  .admin-card { display: grid; grid-template-columns: 30px 1fr; column-gap: 10px; text-align: left; align-items: center; }
   .admin-card-icon { grid-row: span 2; margin: 0; }
   .admin-card h3, .admin-card p { grid-column: 2; }
   .admin-card p { margin-bottom: 10px; }
-  .admin-card .btn { grid-column: 1 / -1; }
+  .admin-card .btn { grid-column: 1 / -1; margin-top: 2px; }
 }
 
 .student-progress-section {

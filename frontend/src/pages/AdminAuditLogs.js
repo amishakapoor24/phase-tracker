@@ -55,10 +55,10 @@ export default function AdminAuditLogs() {
               <tbody>
                 {logs.map((log) => (
                   <tr key={log._id}>
-                    <td className="timestamp">
+                    <td className="timestamp" data-label="When">
                       {new Date(log.createdAt).toLocaleString()}
                     </td>
-                    <td>
+                    <td data-label="User">
                       {log.user ? (
                         <div>
                           <div style={{ fontWeight: 'bold' }}>{log.user.name}</div>
@@ -68,13 +68,13 @@ export default function AdminAuditLogs() {
                         <span className="text-muted">Unknown User</span>
                       )}
                     </td>
-                    <td>
+                    <td data-label="Action">
                       <span className={`action-badge ${getActionClass(log.action)}`}>
                         {log.action.replace(/_/g, ' ')}
                       </span>
                     </td>
-                    <td className="ip-address">{log.ipAddress || '—'}</td>
-                    <td>
+                    <td className="ip-address" data-label="IP address">{log.ipAddress || '—'}</td>
+                    <td data-label="Details">
                       {log.details ? (
                         <div className="meta-details">
                           {Object.entries(log.details).map(([key, val]) => (

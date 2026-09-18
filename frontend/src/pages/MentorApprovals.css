@@ -334,7 +334,10 @@
 }
 
 @media (max-width: 768px) {
+  .approvals-inner { padding: 20px 16px 36px; }
   .approvals-header {
+    padding: 20px;
+    margin-bottom: 16px;
     flex-direction: column;
     gap: 16px;
     align-items: flex-start;
@@ -343,10 +346,28 @@
   .filter-buttons {
     width: 100%;
     flex-wrap: wrap;
+    gap: 8px;
   }
+
+  .filter-btn { flex: 1; min-width: 0; padding: 8px 10px; font-size: 12px; }
 
   .approval-header-row {
     flex-direction: column;
     gap: 12px;
   }
+
+  .approval-card { padding: 16px; }
+  .approval-meta { width: 100%; justify-content: space-between; }
+  .modal-actions { flex-direction: column; }
+}
+
+@media (max-width: 420px) {
+  .approvals-inner { padding-inline: 12px; }
+  .approvals-header { padding: 16px; }
+  .approvals-header h1 { font-size: 22px; }
+  .approvals-header p { font-size: 12px; line-height: 1.5; }
+  .approval-student-info { gap: 9px; }
+  .student-avatar { width: 40px; height: 40px; font-size: 20px; }
+  .approval-student-info h3 { font-size: 14px; }
+  .student-email, .student-house, .approval-content p, .date { font-size: 11px; }
 }

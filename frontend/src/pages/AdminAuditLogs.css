@@ -6,7 +6,7 @@
 .logs-inner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 80px 24px 40px;
+  padding: 32px 24px 56px;
 }
 
 .logs-header {
@@ -118,4 +118,25 @@
   border-radius: 12px;
   color: #6b7280;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 768px) {
+  .logs-inner { padding: 22px 16px 40px; }
+  .logs-header { margin-bottom: 20px; }
+  .logs-header h1 { font-size: 23px; }
+  .logs-header p { font-size: 13px; line-height: 1.5; }
+  .logs-table-container { background: transparent; box-shadow: none; overflow: visible; }
+  .logs-table, .logs-table tbody, .logs-table tr, .logs-table td { display: block; width: 100%; }
+  .logs-table { min-width: 0; }
+  .logs-table thead { display: none; }
+  .logs-table tr { margin-bottom: 12px; padding: 14px; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, .05); }
+  .logs-table td { display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 10px; padding: 7px 0; border: 0; font-size: 12px; overflow-wrap: anywhere; }
+  .logs-table td::before { content: attr(data-label); color: #6b7280; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+  .logs-table td.timestamp { white-space: normal; }
+  .meta-details { max-width: none; }
+}
+
+@media (max-width: 420px) {
+  .logs-inner { padding-inline: 12px; }
+  .logs-table td { grid-template-columns: 66px minmax(0, 1fr); gap: 8px; }
 }

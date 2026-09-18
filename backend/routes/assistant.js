@@ -204,9 +204,12 @@ router.post('/chat', async (req, res) => {
 
     const assistantUrl = process.env.STS_ASSISTANT_URL || 'http://localhost:8001';
     try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), Number(process.env.STS_ASSISTANT_TIMEOUT_MS || 30000));
       const assistantResponse = await fetch(`${assistantUrl}/api/chat/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           text: String(text).trim(),
           conversation: Array.isArray(conversation) ? conversation.slice(-12) : [],
@@ -220,6 +223,7 @@ router.post('/chat', async (req, res) => {
           }
         })
       });
+      clearTimeout(timeout);
       const assistantData = await assistantResponse.json();
       if (assistantResponse.ok && assistantData.success && assistantData.response) {
         return res.json({
@@ -228,71 +232,13 @@ router.post('/chat', async (req, res) => {
           source: 'sts-assistant'
         });
       }
-      console.error('STS assistant response error:', assistantData.detail || assistantData.message || assistantResponse.statusText);
+      const upstreamMessage = assistantData.detail || assistantData.message || assistantResponse.statusText;
+      console.error('STS assistant response error:', upstreamMessage);
+      return res.status(502).json({ message: 'Assistant service could not answer this request.' });
     } catch (assistantError) {
       console.error('STS assistant unavailable:', assistantError.message);
+      return res.status(502).json({ message: 'Assistant service is temporarily unavailable.' });
     }
-
-    const context = await getRoleContext(req.user);
-    const scopeSummary = buildAssistantReply(req.user, context);
-    const cleanText = String(text).trim();
-    const lower = cleanText.toLowerCase();
-
-    const lowerPieces = [
-      'progress', 'phase', 'subphase', 'reflection', 'approval', 'student', 'mentor', 'house', 'report', 'analytics', 'audit', 'admin', 'status'
-    ];
-
-    const relevant = lowerPieces.filter(item => lower.includes(item));
-    let response = `I’m your ${req.user.role} assistant and I can help with ${scopeSummary.supportedQuestions.join(', ')}.`;
-
-    if (req.user.role === 'student') {
-      const profile = context.context.personal.profile;
-      const progress = context.context.personal.progress;
-      const phases = context.context.personal.phases || [];
-      const pending = context.context.personal.pendingApprovals || [];
-
-      response = `Hello ${profile?.name || 'student'}, your current access is limited to your own learning data. You have ${progress?.phases?.filter(p => p.status === 'completed').length || 0} completed phase(s), ${pending.length} pending approval(s), and ${phases.length} tracked phase(s).`;
-
-      if (lower.includes('phase') || lower.includes('progress')) {
-        response += ' I can explain your current phase status, unlocked work, and the next milestone to complete.';
-      }
-      if (lower.includes('approval') || lower.includes('reflection')) {
-        response += ' I can summarize the review status of your submissions and reflections in your personal scope.';
-      }
-    }
-
-    if (req.user.role === 'mentor') {
-      const pending = context.context.team.pendingApprovals || [];
-      const students = context.context.team.students || [];
-      response = `You have access to mentor workspace data for ${students.length} student(s) and ${pending.length} pending approval(s).`;
-      if (lower.includes('student') || lower.includes('progress')) {
-        response += ' I can review student status, progress trends, and outstanding approvals that are in your mentoring scope.';
-      }
-      if (lower.includes('house')) {
-        response += ' I can also summarize area-level insight for active houses under your visibility.';
-      }
-    }
-
-    if (req.user.role === 'admin') {
-      const students = context.context.admin.students || [];
-      const mentors = context.context.admin.mentors || [];
-      const houses = context.context.admin.houses || [];
-      response = `As admin, you can access platform-wide information for ${students.length} student(s), ${mentors.length} mentor(s), and ${houses.length} house(s).`;
-      if (lower.includes('audit') || lower.includes('logs')) {
-        response += ' I can reference the recent audit activity and system events in admin scope.';
-      }
-    }
-
-    if (relevant.length === 0) {
-      response = `I can help with your ${req.user.role} data area: ${scopeSummary.supportedQuestions.join(', ')}.`;
-    }
-
-    res.json({
-      response,
-      role: req.user.role,
-      scope: scopeSummary,
-      dataSummary: context.stats
-    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
